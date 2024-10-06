@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body
 from fastapi.openapi.docs import (
     get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
@@ -12,6 +12,7 @@ hotels = [
     {"id": 1, "title": "Sochi"},
     {"id": 2, "title": "Дубай"},
 ]
+
 
 @app.get("/hotels")
 def get_hotels(
@@ -28,10 +29,23 @@ def get_hotels(
         hotels_.append(hotel)
     return hotels_
 
+
 @app.delete("/hotels/{hotel_id}")
 def delete_hotel(hotel_id: int):
     global hotels
     hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
+    return {"status": "OK"}
+
+
+@app.post("/hotels")
+def create_hotel(
+        title: str = Body(embed=True),
+):
+    global hotels
+    hotels.append({
+        "id": hotels[-1]["id"] + 1,
+        "title": title
+    })
     return {"status": "OK"}
 
 
