@@ -1,14 +1,17 @@
 from fastapi import Query, APIRouter, Body
-
 from schemas.hotels import Hotel, HotelPATCH
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
-
 hotels = [
     {"id": 1, "title": "Sochi", "name": "sochi"},
     {"id": 2, "title": "Дубай", "name": "dubai"},
+    {"id": 3, "title": "Мальдивы", "name": "maldivi"},
+    {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
+    {"id": 5, "title": "Москва", "name": "moscow"},
+    {"id": 6, "title": "Казань", "name": "kazan"},
+    {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
 
 
@@ -17,15 +20,19 @@ hotels = [
 def get_hotels(
         id: int | None = Query(None, description="ID отеля"),
         title: str | None = Query(None, description="Название отеля"),
+        page: int | None = Query(None, gt=1),
+        per_page: int | None = Query(None, gt=1, lt=30),
 ):
     hotels_ = []
-
     for hotel in hotels:
         if id and hotel["id"] != id:
             continue
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
+
+    if page and per_page:
+        return hotels_[per_page * (page-1):][:per_page]
     return hotels_
 
 
