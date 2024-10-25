@@ -1,5 +1,7 @@
-from fastapi import Query, Body, APIRouter
-from pydantic import BaseModel
+from fastapi import Query, APIRouter
+
+from schemas.hotels import Hotel, HotelPATCH
+
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
@@ -34,9 +36,6 @@ def delete_hotel(hotel_id: int):
     hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
     return {"status": "OK"}
 
-class Hotel(BaseModel):
-    title: str
-    name: str
 
 @router.post("",
              summary="Добавить отель")
@@ -65,13 +64,12 @@ def edit_hotel(hotel_id: int, hotel_data: Hotel):
            description="<h1>Тут мы частично обновляем данные об отеле: можно отправить name, а можно title</h1>")
 def partially_edit_hotels(
         hotel_id: int,
-        title: str | None = Body(None),
-        name: str | None = Body(None),
+        hotel_data: HotelPATCH
 ):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
-    if title:
-        hotel["title"] = title
-    if name:
-        hotel["name"] = name
+    if hotel_data.title:
+        hotel["title"] = hotel_data.title
+    if hotel_data.name:
+        hotel["name"] = hotel_data.name
     return {"status": "OK"}
