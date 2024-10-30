@@ -21,25 +21,14 @@ async def get_hotels(
         title: str | None = Query(None, description="Название отеля"),
 
 ):
+    per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        return await HotelsRepository(session).get_all()
-    # per_page = pagination.per_page or 5
-    # async with async_session_maker() as session:
-    #     query = select(HotelsOrm)
-    #     if location:
-    #         query = query.filter(func.lower(HotelsOrm.location).like(f"%{location.strip().lower()}%"))
-    #     if title:
-    #         query = query.filter(func.lower(HotelsOrm.title).like(f"%{title.strip().lower()}%"))
-    #     query = (
-    #         query
-    #         .limit(per_page)
-    #         .offset(per_page * (pagination.page - 1))
-    #     )
-    #     print(query.compile(engine, compile_kwargs={"literal_binds": True}))
-    #     result = await session.execute(query)
-    #
-    #     hotels = result.scalars().all()
-    #     return hotels
+        return await HotelsRepository(session).get_all(
+            location=location,
+            title=title,
+            limit=per_page,
+            offset=per_page * (pagination.page - 1)
+        )
 
 
 @router.delete("/{hotel_id}",
