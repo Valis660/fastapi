@@ -1,10 +1,10 @@
 from sqlalchemy import select, func
 
-from src.repositories.base import BaseRepositoriy
+from src.repositories.base import BaseRepository
 from src.models.hotels import HotelsOrm
 
 
-class HotelsRepository(BaseRepositoriy):
+class HotelsRepository(BaseRepository):
     model = HotelsOrm
 
     async def get_all(
