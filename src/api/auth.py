@@ -1,3 +1,6 @@
+from os import access
+from urllib.request import Request
+
 from fastapi import APIRouter, HTTPException, Response
 
 from src.repositories.users import UsersRepository
@@ -46,3 +49,12 @@ async def get_me(
     async with async_session_maker() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user
+
+
+@router.get("/logout")
+async def logout(response: Response, user_id: UserIdDep):
+    async with async_session_maker() as session:
+        await UsersRepository(session).get_one_or_none(id=user_id)
+        response.delete_cookie("access_token")
+
+        return {"status": "OK"}
