@@ -1,9 +1,5 @@
-from dns.e164 import query
-from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
-
-from src.schemas.hotels import Hotel
 
 
 class BaseRepository:

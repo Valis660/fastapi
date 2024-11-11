@@ -1,19 +1,19 @@
 from sqlalchemy import select
 
 from src.repositories.base import BaseRepository
-from src.models.rooms import RoomsOrm
-from src.schemas.rooms import Room
+from src.models.bookings import BookingsOrm
+from src.schemas.bookings import Booking
 
 
-class RoomsRepository(BaseRepository):
-    model = RoomsOrm
-    schema = Room
+class BookingRepository(BaseRepository):
+    model = BookingsOrm
+    schema = Booking
 
     async def get_all(
             self
-    ) -> list[Room]:
+    ) -> list[Booking]:
 
-            query = select(RoomsOrm)
+            query = select(BookingsOrm)
             print(query.compile(compile_kwargs={"literal_binds": True}))
             result = await self.session.execute(query)
 
