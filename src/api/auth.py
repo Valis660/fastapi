@@ -8,7 +8,8 @@ from src.services.auth import AuthService
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
 
-@router.post("/register")
+@router.post("/register",
+             summary="Регистрация")
 async def register_user(
         db: DBDep,
         data: UserRequestAdd,
@@ -21,7 +22,8 @@ async def register_user(
     return {"status": "OK"}
 
 
-@router.post("/login")
+@router.post("/login",
+             summary="Аутентификация")
 async def login_user(
         db: DBDep,
         data: UserRequestAdd,
@@ -38,7 +40,8 @@ async def login_user(
     return {"access_token": access_token}
 
 
-@router.get("/me")
+@router.get("/me",
+            summary="Авторизация")
 async def get_me(
         db: DBDep,
         user_id: UserIdDep,
@@ -47,7 +50,8 @@ async def get_me(
     return user
 
 
-@router.post("/logout")
+@router.post("/logout",
+             summary="Выход из системы")
 async def logout(response: Response):
         response.delete_cookie("access_token")
         return {"status": "OK"}

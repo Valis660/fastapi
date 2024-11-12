@@ -9,9 +9,7 @@ class RoomsRepository(BaseRepository):
     model = RoomsOrm
     schema = Room
 
-    async def get_all(
-            self
-    ) -> list[Room]:
+    async def get_all(self) -> list[Room]:
 
             query = select(RoomsOrm)
             print(query.compile(compile_kwargs={"literal_binds": True}))
