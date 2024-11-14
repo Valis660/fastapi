@@ -15,31 +15,10 @@ class RoomsRepository(BaseRepository):
 
     async def get_filtered_bytime(
             self,
-            hotel_id: int,
+            hotel_id,
             date_from: date,
             date_to: date
-):
-        """
-        with rooms_count as (
-            select room_id, count(*) as rooms_bron from bookings
-            where date_from >= '2024-11-11' and date_to <= '2024-11-20'
-            group by room_id
-        ),
-        rooms_left_table as (
-            select rooms.id as room_id, quantity - coalesce (rooms_bron, 0) as rooms_left
-            from rooms
-            left join rooms_count on rooms.id = rooms_count.room_id
-	    )
-        select * from rooms_left_table
-        where rooms_left > 0;
-        """
-
-        """
-        select room_id, count(*) as rooms_bron from bookings
-            where date_from >= '2024-11-11' and date_to <= '2024-11-20'
-            group by room_id
-        """
-
+    ):
         rooms_count = (
             select(BookingsOrm.room_id, func.count("*").label("rooms_booked"))
             .select_from(BookingsOrm)
@@ -51,12 +30,6 @@ class RoomsRepository(BaseRepository):
             .cte(name="rooms_count")
         )
 
-        """
-        rooms_left_table as (
-            select rooms.id as room_id, quantity - coalesce (rooms_bron, 0) as rooms_left
-            from rooms
-            left join rooms_count on rooms.id = rooms_count.room_id
-        """
         rooms_left_table = (
             select(
                 RoomsOrm.id.label("room_id"),
@@ -66,15 +39,23 @@ class RoomsRepository(BaseRepository):
             .outerjoin(rooms_count, RoomsOrm.id == rooms_count.c.room_id)
             .cte("rooms_left_table")
         )
-        """
-        select * from rooms_left_table
-        where rooms_left > 0;
-        """
 
-        query = (
-            select(rooms_left_table)
-            .select_from(rooms_left_table)
-            .filter(rooms_left_table.c.rooms_left > 0)
+        rooms_ids_for_hotel = (
+            select(RoomsOrm.id)
+            .select_from(RoomsOrm)
+            .filter_by(hotel_id=hotel_id)
+            .subquery(name="rooms_ids_for_hotel")
         )
 
-        print(query.compile(bind=engine, compile_kwargs={"literal_binds": True}))
+        rooms_ids_to_get = (
+            select(rooms_left_table.c.room_id)
+            .select_from(rooms_left_table)
+            .filter(
+        rooms_left_table.c.rooms_left > 0,
+                rooms_left_table.c.room_id.in_(rooms_ids_for_hotel)
+            )
+        )
+        #
+        # print(rooms_ids_to_get.compile(bind=engine, compile_kwargs={"literal_binds": True}))
+
+        return await self.get_filtered(RoomsOrm.id.in_(rooms_ids_to_get))
