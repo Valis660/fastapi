@@ -1,4 +1,6 @@
 from celery import Celery
+from celery.schedules import crontab
+
 from src.config import settings
 
 celery_instance = Celery(
@@ -8,3 +10,10 @@ celery_instance = Celery(
         "src.tasks.tasks",
     ],
 )
+
+celery_instance.conf.beat_schedule = {
+    "luboe-nazvanie": {
+        "task": "booking_today_checkin",
+        "schedule": 30,
+    }
+}
